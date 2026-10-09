@@ -1,1 +1,0 @@
-/* External entry point kept for deployment tooling that expects a JS asset. */
