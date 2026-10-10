@@ -390,11 +390,8 @@
       padding:clamp(10px,1.6vw,16px);
       background:linear-gradient(158deg,var(--frame-hi) 0%,var(--frame-mid) 46%,var(--frame-lo) 100%);
       border:1px solid var(--frame-edge);
-      box-shadow:
-        0 24px 48px rgba(0,0,0,.55),
-        0 4px 12px rgba(0,0,0,.42),
-        inset 0 1px 0 rgba(255,255,255,.72),
-        inset 0 -2px 0 rgba(0,0,0,.14);
+      /* A single restrained shadow is cheaper to repaint while cards move. */
+      box-shadow:0 16px 32px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.38);
     }
     .js-anim .memory{
       position:absolute;
@@ -413,7 +410,8 @@
       /* The print sits behind a hairline keyline inside its rail. The
          shadow exists purely so overlapping frames separate during a
          transition. */
-      box-shadow:0 0 0 1px var(--frame-key), 0 8px 18px rgba(0,0,0,.4);
+      /* Keep only the crisp photo keyline; the frame owns the drop shadow. */
+      box-shadow:0 0 0 1px var(--frame-key);
     }
 
     /* EDIT: write a caption inside any <figcaption> below — it appears
@@ -703,7 +701,7 @@
     }
     .letter-inner{
       position:relative;
-      width:min(91vw,660px);
+      width:min(92vw,680px);
       margin:clamp(42px,8svh,76px) auto;
       /* Extra top room makes the corner flower feel attached to the paper,
          rather than sitting in the middle of the heading. */
@@ -935,7 +933,7 @@
         gap:var(--s3);
       }
       .letter-photo{width:100%}
-      .memory{width:min(54vw,54svh,500px)}
+      .memory{width:min(58vw,62svh,560px)}
       .memory-stack{gap:var(--s6)}
       .stage--memories{gap:var(--s6)}
       /* the finale breathes more generously without stretching */
@@ -946,7 +944,48 @@
       .finale-message{max-width:16ch}
     }
     @media (min-width:1100px){
-      .memory{width:min(44vw,56svh,560px)}
+      .memory{width:min(43vw,65svh,600px)}
+    }
+
+    /* Desktop and large tablets: use the available space without letting
+       the letter become too wide to read comfortably. The image remains
+       centered because there is only one keepsake photo in this letter. */
+    @media (min-width:900px){
+      .letter-inner{
+        width:min(84vw,780px);
+        padding:clamp(82px,8vw,96px) clamp(64px,7vw,88px) clamp(48px,6vw,64px);
+      }
+      .letter-copy{
+        max-width:58ch;
+        font-size:clamp(18px,1.35vw,20px);
+        line-height:1.88;
+      }
+      .letter-photos{
+        grid-template-columns:minmax(0,320px);
+        justify-content:center;
+        justify-items:center;
+      }
+      .letter-photo{width:min(100%,320px)}
+      .letter-signature-row{margin-top:46px;gap:14px}
+      .letter-sign-carnation{width:40px;height:52px}
+      .memories-heading h2{font-size:clamp(38px,4vw,54px)}
+      .finale-inner{max-width:680px}
+    }
+
+    /* Small screens: keep the long letter comfortable and prevent the
+       header flower, title, and signature decoration from feeling cramped. */
+    @media (max-width:390px){
+      .stage--hero{padding-inline:20px}
+      .hero-label{font-size:clamp(27px,8.2vw,33px)}
+      .music-button{width:64px;height:64px}
+      .letter-inner{width:94%;padding:72px 20px 30px}
+      .letter-inner::before{inset:8px}
+      .letter-orn{top:14px;right:14px;width:34px;height:45px}
+      .letter-title{font-size:clamp(29px,8.5vw,36px)}
+      .letter-copy{font-size:16.5px;line-height:1.82}
+      .letter-sign{font-size:clamp(27px,7.5vw,32px)}
+      .letter-signature-row{gap:5px}
+      .letter-sign-carnation{width:27px;height:37px}
     }
     /* Short landscape screens: keep the opening comfortable. */
     @media (max-height:520px) and (orientation:landscape){
@@ -1254,6 +1293,9 @@
       const lerp = (a, b, t) => a + (b - a) * t;
       const smoothstep = (t) => t * t * (3 - 2 * t);
       const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      const setStyle = (el, property, value) => {
+        if (el && el.style[property] !== value) el.style[property] = value;
+      };
 
       const heroScene = document.getElementById('heroScene');
       const heroOpening = document.getElementById('heroOpening');
@@ -1303,9 +1345,9 @@
          Opacity + small translate only — no tilt, scale or rotation. ---- */
       const renderHero = (p) => {
         const t = easeOut(clamp((p - 0.2) / 0.8, 0, 1));
-        heroOpening.style.transform = `translate3d(0, ${(-5 * t).toFixed(2)}vh, 0)`;
-        heroOpening.style.opacity = String(1 - smoothstep(clamp((t - 0.2) / 0.8, 0, 1)));
-        scrollCue.style.opacity = String(clamp(1 - p * 7, 0, 1));
+        setStyle(heroOpening, 'transform', `translate3d(0, ${(-5 * t).toFixed(2)}vh, 0)`);
+        setStyle(heroOpening, 'opacity', String(1 - smoothstep(clamp((t - 0.2) / 0.8, 0, 1))));
+        setStyle(scrollCue, 'opacity', String(clamp(1 - p * 7, 0, 1)));
       };
 
       /* ---- Chapter 02: one photo at a time, strictly vertical ----
@@ -1342,8 +1384,8 @@
         else pos = N - 1;
 
         const h = smoothstep(clamp((p - TITLE_END) / 0.06, 0, 1));
-        memoriesHeading.style.opacity = String(1 - h);
-        memoriesHeading.style.transform = `translate3d(0, ${(-14 * h).toFixed(2)}px, 0)`;
+        setStyle(memoriesHeading, 'opacity', String(1 - h));
+        setStyle(memoriesHeading, 'transform', `translate3d(0, ${(-14 * h).toFixed(2)}px, 0)`);
 
         for (let k = 0; k < N; k++) {
           const d = k - pos;
@@ -1375,13 +1417,13 @@
           }
 
           const el = photos[k];
-          el.style.opacity = opacity.toFixed(3);
-          el.style.zIndex = String(40 + Math.round(clamp(d, -1, 1) * 20));
+          setStyle(el, 'opacity', opacity.toFixed(3));
+          setStyle(el, 'zIndex', String(40 + Math.round(clamp(d, -1, 1) * 20)));
           if (opacity > 0) {
-            el.style.transform =
-              `translate3d(0, ${y.toFixed(2)}%, 0) rotate(${rotate.toFixed(3)}deg) scale(${scale.toFixed(4)})`;
+            setStyle(el, 'transform',
+              `translate3d(0, ${y.toFixed(2)}%, 0) rotate(${rotate.toFixed(3)}deg) scale(${scale.toFixed(4)})`);
           } else {
-            el.style.transform = 'none';
+            setStyle(el, 'transform', 'none');
           }
         }
       };
@@ -1395,17 +1437,17 @@
       const renderQuiet = (p) => {
         const lineIn = smoothstep(clamp((p - 0.08) / 0.24, 0, 1));
         const lineOut = smoothstep(clamp((p - 0.60) / 0.28, 0, 1));
-        quietLine.style.opacity = (lineIn * (1 - lineOut)).toFixed(3);
-        quietLine.style.transform =
-          `translate3d(0, ${((1 - lineIn) * 16 - lineOut * 12).toFixed(2)}px, 0)`;
+        setStyle(quietLine, 'opacity', (lineIn * (1 - lineOut)).toFixed(3));
+        setStyle(quietLine, 'transform',
+          `translate3d(0, ${((1 - lineIn) * 16 - lineOut * 12).toFixed(2)}px, 0)`);
       };
 
       /* ---- Chapter 04: the calmest arrival, then the signature ---- */
       let signed = false;
       const renderLetter = (rect, vh) => {
         const a = smoothstep(clamp((vh - rect.top) / (vh * 0.8), 0, 1));
-        letterInner.style.opacity = a.toFixed(3);
-        letterInner.style.transform = `translate3d(0, ${((1 - a) * 26).toFixed(2)}px, 0)`;
+        setStyle(letterInner, 'opacity', a.toFixed(3));
+        setStyle(letterInner, 'transform', `translate3d(0, ${((1 - a) * 26).toFixed(2)}px, 0)`);
 
         if (!signed && a > 0.55) {
           signed = true;
@@ -1416,8 +1458,8 @@
       /* ---- Chapter 05: the joke arrives — a slow, single reveal ---- */
       const renderFinale = (rect, vh) => {
         const a = smoothstep(clamp((vh - rect.top) / (vh * 0.7), 0, 1));
-        finaleInner.style.opacity = a.toFixed(3);
-        finaleInner.style.transform = `translate3d(0, ${((1 - a) * 22).toFixed(2)}px, 0)`;
+        setStyle(finaleInner, 'opacity', a.toFixed(3));
+        setStyle(finaleInner, 'transform', `translate3d(0, ${((1 - a) * 22).toFixed(2)}px, 0)`);
       };
 
       let ticking = false;
