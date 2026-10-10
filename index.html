@@ -699,42 +699,51 @@
     .scene--letter{
       background:var(--alt);
       padding:1px 0;
-      color:#3d292d;
+      color:#302126;
     }
     .letter-inner{
+      position:relative;
       width:min(91vw,660px);
       margin:clamp(42px,8svh,76px) auto;
-      padding:clamp(40px,7vw,66px) clamp(25px,7vw,58px) clamp(34px,6vw,52px);
-      background-color:#E8D8D0;
+      /* Extra top room makes the corner flower feel attached to the paper,
+         rather than sitting in the middle of the heading. */
+      padding:clamp(78px,9vw,90px) clamp(25px,7vw,58px) clamp(34px,6vw,52px);
+      background-color:#BDA09B;
       background-image:none;
-      color:#3d292d;
-      border:1px solid #C9ADA6;
+      color:#302126;
+      border:1px solid #927572;
       border-radius:2px;
       box-shadow:0 24px 55px rgba(0,0,0,.38), 0 3px 8px rgba(0,0,0,.2);
       text-align:left;
     }
     .letter-inner::before{
       inset:10px;
-      border:1px solid rgba(113,55,66,.2);
+      border:1px solid rgba(72,35,43,.28);
     }
-    .letter-head{ text-align:center; }
+    /* Keep the header in normal flow while the flower anchors to the paper. */
+    .letter-head{ position:static; text-align:center; }
     .letter-kicker{
-      color:#89505B;
+      color:#683B46;
       font-size:10px;
       letter-spacing:.2em;
     }
     .letter-orn{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      margin:17px auto 20px;
-      max-width:none;
-      color:#8E263C;
+      position:absolute;
+      top:17px;
+      right:22px;
+      z-index:2;
+      display:block;
+      width:44px;
+      height:56px;
+      margin:0;
+      color:#762A3B;
+      transform:rotate(9deg);
+      pointer-events:none;
     }
     .letter-orn::before,.letter-orn::after{ display:none; }
-    .letter-orn svg{ width:48px; height:60px; }
+    .letter-orn svg{ display:block; width:100%; height:100%; }
     .letter-title{
-      color:#452D32;
+      color:#352329;
       font-size:clamp(34px,7vw,54px);
       font-weight:400;
       line-height:1.12;
@@ -742,39 +751,60 @@
     .letter-copy{
       max-width:49ch;
       margin:clamp(27px,4vw,38px) auto 0;
-      color:#49373A;
+      color:#3D2D31;
       font-size:clamp(17px,2.3vw,19px);
       line-height:1.9;
     }
     .letter-photos{ gap:26px; margin-top:34px; }
     .letter-photo{
-      background:#F0E5DF;
+      background:#CEB8B0;
       background-image:none;
-      border:1px solid #D1B9B0;
+      border:1px solid #A78C85;
       border-radius:1px;
       padding:9px;
-      box-shadow:0 8px 18px rgba(67,45,50,.13);
+      box-shadow:0 8px 18px rgba(0,0,0,.2);
     }
     .letter-photo img{ box-shadow:none; }
     .letter-photo figcaption{
-      color:#89505B;
-      border-top-color:#D8C4BC;
+      color:#683B46;
+      border-top-color:#B49A92;
     }
-    .letter-sign{
-      color:#8E4052;
+    .letter-signature-row{
+      display:flex;
+      align-items:flex-end;
+      justify-content:flex-end;
+      gap:10px;
+      width:100%;
       margin-top:38px;
     }
+    .letter-sign{
+      flex:1 1 auto;
+      min-width:0;
+      margin-top:0;
+      color:#713746;
+    }
     .letter-sign::before{
-      background:#C49CA0;
+      background:#9E777E;
       opacity:.75;
     }
+    .letter-sign-carnation{
+      display:block;
+      flex:0 0 auto;
+      width:36px;
+      height:47px;
+      margin-bottom:1px;
+      transform:rotate(8deg);
+      opacity:.94;
+    }
+    .letter-sign-carnation svg{ display:block; width:100%; height:100%; }
     @media(max-width:480px){
-      .letter-inner{ width:92%; padding:38px 26px 34px; }
+      .letter-inner{ width:92%; padding:76px 26px 34px; }
       .letter-inner::before{ inset:8px; }
-      .letter-orn svg{ width:42px; height:54px; }
+      .letter-orn{ top:15px; right:17px; width:38px; height:49px; }
       .letter-copy{ font-size:17px; line-height:1.85; }
       .letter-photos{ gap:22px; margin-top:28px; }
-      .letter-sign{ margin-top:32px; }
+      .letter-signature-row{ margin-top:32px; gap:7px; }
+      .letter-sign-carnation{ width:31px; height:42px; }
     }
     @media(prefers-reduced-motion:reduce){
       .letter-photo{ transition:none; }
@@ -953,7 +983,7 @@
                  onerror="this.closest('.hero-flower').classList.add('is-missing')">
           </div>
 
-          <p class="hero-label" id="heroLabel"><span>I picked this for you :></span></p>
+          <p class="hero-label" id="heroLabel"><span>Carnation for you :></span></p>
 
           <div class="hero-play">
             <button class="music-button" id="musicButton" aria-label="Play the song">
@@ -977,7 +1007,7 @@
         <!-- EDIT: your song. Replace the file (keep the path, or update it
              here). Never autoplays — she starts it with the button above. -->
         <audio id="song" preload="metadata">
-          <source src="assets/Taylor%20Swift%20-%20Ruin%20The%20Friendship%20(Lyric%20Video).mp3" type="audio/mpeg">
+          <source src="assets/Ruin The Friendship (My Advice Version).mp3" type="audio/mpeg">
         </audio>
       </div>
     </section>
@@ -1066,18 +1096,38 @@
             </svg>
           </span>
 
-          <h1 class="letter-title">Here's to ruining the friendship :></h1>
+          <h1 class="letter-title">Happy Monthsary Wifey!</h1>
         </header>
 
         <!-- EDIT: your message. Blank lines create paragraphs. -->
-        <div class="letter-copy">Hi Wifey,
+        <div class="letter-copy">
 
-        I still remember when I'm just looking at you during the christmas party hehe and now its our 2nd month of being together :> <br>
-        I'm glad I'm able to find your facebook, being a stalker hehe I would say its really leadinhg me back to you. Good thing I'm brave enough to add you, and to message you about scd. <br>
-        If I'm not brave enough to message you, then I'm never gonna be happy like this. The way you make me smile and the way you spoil meT-T wala akong palag. <br>
+          I just wanna say  to my special someone, I love you so much I hope it can reach you there sa QC. Wifey even with our distance my love for you will never fade, instead it will continue to grow stronger and stronger  everyday. 
 
-        Wifey, I wanna say that I'm glad I ruined the friendship. Without you in my life I don't where am I rn expecially with the SCD T-T, wife
-      </div>
+          Nung una akala ko ang LDR is not for me  like it won't work but I was wrong, wifey we're a proof that LDR works hehe. 
+
+          Being in an LDR relationship taught me that love isn't about seeing each other everyday, its about choosing each other everyday despite the distance and the challenges we face together.
+
+          While I miss you everyday, wifey I always think about you and I always pray na safe ka  and healthy. I'm worried kasi hindi ka nakakakain and omad ka madalasT-T. I'n worried baka lumala illness mo. Please take care of yourself po wifey while I'm away oki?
+          
+          Wifey I love you all the way  from my heart to wherever you are, you complete me po hehe I really really appreciate all of youu
+          
+          I hope someday we get to live together, eating toegther, sleeping together , working together, watching the sunset  and I hope to see your beautiful eyes  before sleeping and after waking up first in the morning. I love looking at your beautiful eyes hehe.
+
+          Wifey I believe in the intimacy of kissing like its more than our lips touching, like our hearts are together, I get to feel your breathing, your heartbeat and our love :>
+
+          Kissing for me is the most  intimate thing we can do, thats why I always want to kiss you and I love you kissing you and I beg for it hehe. I just wanna kiss my wifey (kahit hindi pa ako marunong)
+
+          To love you is never about sex, its about knowing you, understanding you that other people don't know about you, getting to know what are your favorites, what makes you happy, what makes you sad, what makes you angry, spoiling you, caring for you, giving you carnations , holding your hands , kissing you, hugging you , holding your waist and more :>
+
+          Thank you for spoiling for the whole september and coming to my birthday, I really appreciate it T-T I love you I love you I love you I love you I love you I love you I love you AAAAAACCCCCKKKKK wifey we'll celebrate your birthday next year oki? mwaaa mwaa mwaaa mwaa mwaa mwaaa
+
+          I will love you with all of the love languages na meron, I'll even invent new love languages just to love you more. Wifey I love you so much, I wll do anything for you, please bare with me. Once may work na ako, I'll do my best and  work hard so that we can live together :>
+
+          Here's to ruining the friendship
+          
+          Happy Monthsary Wifey :>
+        </div>
 
         <div class="letter-photos">
           <figure class="letter-photo">
@@ -1086,7 +1136,20 @@
           </figure>
         </div>
 
-        <div class="letter-sign" id="letterSign"><span class="ink">yours, hubby :&gt;</span></div>
+        <div class="letter-signature-row">
+          <div class="letter-sign" id="letterSign"><span class="ink">yours, hubby :&gt;</span></div>
+          <span class="letter-sign-carnation" aria-hidden="true">
+            <svg viewBox="0 0 80 100" fill="none">
+              <path d="M39 43 C42 59 43 75 40 94" stroke="#617052" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M41 69 C54 57 62 63 62 63 C57 75 49 78 41 73" fill="#71805A"/>
+              <path d="M40 81 C29 70 21 75 21 75 C26 85 33 88 40 84" fill="#65764F"/>
+              <path d="M39 48 C30 42 22 38 20 28 C15 22 20 17 25 19 C22 11 29 7 34 13 C37 4 45 6 46 14 C53 8 60 14 56 21 C65 20 67 28 60 33 C61 42 50 47 39 48Z" fill="#8E263C"/>
+              <path d="M25 30 C19 23 27 18 31 26 C29 16 38 13 40 24 C43 13 52 17 48 27 C57 20 62 29 52 34 C59 37 53 44 45 38 C43 47 35 43 37 36 C29 43 23 37 30 32Z" fill="#B84D61"/>
+              <path d="M32 29 C35 22 43 23 44 31 C49 25 55 31 49 36 C45 43 34 40 32 29Z" fill="#D17B85"/>
+              <path d="M39 44 L39 51" stroke="#6D4A42" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </div>
       </div>
     </section>
 
@@ -1122,7 +1185,7 @@
       </div>
     </section>
 
-    <div class="footer">made for you wifey</div>
+    <div class="footer">created by your hubby :></div>
   </main>
 
   <script>
